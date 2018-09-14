@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import Minesweeper from "components/Minesweeper";
 
 // Emoji SVG.
@@ -121,7 +121,7 @@ class App extends Component {
       bombs: settings.bombs || 10,
       flags: settings.bombs || 10,
       moves: 0,
-      time: "0.00",
+      time: 0,
       minesGrid: [],
       showSettings: false,
       clicking: false,
@@ -146,100 +146,110 @@ class App extends Component {
       gameState
     } = this.state;
     return (
-      <Minesweeper>
-        <Minesweeper.ToggleButton
-          onClick={() =>
-            this.setState(({ showSettings }) => ({
-              showSettings: !showSettings
-            }))
-          }
-        >
-          <img
-            style={{ display: !showSettings ? "block" : "none" }}
-            src={wrench}
-            alt="wrench"
-          />
-          <img
+      <Fragment>
+        <Minesweeper>
+          <Minesweeper.ToggleButton
+            onClick={() =>
+              this.setState(({ showSettings }) => ({
+                showSettings: !showSettings
+              }))
+            }
+          >
+            <img
+              style={{ display: !showSettings ? "block" : "none" }}
+              src={wrench}
+              alt="wrench"
+            />
+            <img
+              style={{ display: showSettings ? "block" : "none" }}
+              src={joystick}
+              alt="joystick"
+            />
+          </Minesweeper.ToggleButton>
+          <Minesweeper.Game>
+            <Minesweeper.Game.Container>
+              <Minesweeper.Game.RestartButton onClick={this.restartGame}>
+                <img
+                  style={{
+                    display: !isEnd(gameState) && !clicking ? "block" : "none"
+                  }}
+                  src={grinning}
+                  alt="grinning"
+                />
+                <img
+                  style={{
+                    display: !isEnd(gameState) && clicking ? "block" : "none"
+                  }}
+                  src={open_mouth}
+                  alt="open_mouth"
+                />
+                <img
+                  style={{ display: gameState === GAME.WIN ? "block" : "none" }}
+                  src={sunglasses}
+                  alt="sunglasses"
+                />
+                <img
+                  style={{
+                    display: gameState === GAME.LOST ? "block" : "none"
+                  }}
+                  src={dizzy_face}
+                  alt="dizzy_face"
+                />
+              </Minesweeper.Game.RestartButton>
+              <Minesweeper.Game.MinesGrid>
+                <MinesGrid />
+              </Minesweeper.Game.MinesGrid>
+            </Minesweeper.Game.Container>
+            <Minesweeper.Game.Statistics>
+              <Minesweeper.Game.Statistics.Field
+                title="Bombs"
+                value={`${flags}/${bombs}`}
+              />
+              <Minesweeper.Game.Statistics.Field
+                title="Moves"
+                value={`${moves}`}
+              />
+              <Minesweeper.Game.Statistics.Field
+                title="Time(s)"
+                value={`${time}`}
+              />
+            </Minesweeper.Game.Statistics>
+          </Minesweeper.Game>
+          <Minesweeper.Settings
             style={{ display: showSettings ? "block" : "none" }}
-            src={joystick}
-            alt="joystick"
-          />
-        </Minesweeper.ToggleButton>
-        <Minesweeper.Game>
-          <Minesweeper.Game.Container>
-            <Minesweeper.Game.RestartButton onClick={this.restartGame}>
-              <img
-                style={{
-                  display: !isEnd(gameState) && !clicking ? "block" : "none"
-                }}
-                src={grinning}
-                alt="grinning"
+          >
+            <Minesweeper.Settings.Grid>
+              <input
+                type="number"
+                defaultValue={rows}
+                onChange={({ target }) => this.modifySetting("rows", target)}
               />
-              <img
-                style={{
-                  display: !isEnd(gameState) && clicking ? "block" : "none"
-                }}
-                src={open_mouth}
-                alt="open_mouth"
+              <span>x</span>
+              <input
+                type="number"
+                defaultValue={columns}
+                onChange={({ target }) => this.modifySetting("columns", target)}
               />
-              <img
-                style={{ display: gameState === GAME.WIN ? "block" : "none" }}
-                src={sunglasses}
-                alt="sunglasses"
+            </Minesweeper.Settings.Grid>
+            <Minesweeper.Settings.Bombs>
+              <span>
+                <img src={bomb} alt="bomb" />
+              </span>
+              <input
+                type="number"
+                defaultValue={bombs}
+                onChange={({ target }) => this.modifySetting("bombs", target)}
               />
-              <img
-                style={{ display: gameState === GAME.LOST ? "block" : "none" }}
-                src={dizzy_face}
-                alt="dizzy_face"
-              />
-            </Minesweeper.Game.RestartButton>
-            <Minesweeper.Game.MinesGrid>
-              <MinesGrid />
-            </Minesweeper.Game.MinesGrid>
-          </Minesweeper.Game.Container>
-          <Minesweeper.Game.Statistics>
-            <Minesweeper.Game.Statistics.Field
-              title="Bombs"
-              value={`${flags}/${bombs}`}
-            />
-            <Minesweeper.Game.Statistics.Field
-              title="Moves"
-              value={`${moves}`}
-            />
-            <Minesweeper.Game.Statistics.Field title="Time" value={`${time}`} />
-          </Minesweeper.Game.Statistics>
-        </Minesweeper.Game>
-        <Minesweeper.Settings
-          style={{ display: showSettings ? "block" : "none" }}
-        >
-          <Minesweeper.Settings.Grid>
-            <input
-              type="number"
-              defaultValue={rows}
-              onChange={({ target }) => this.modifySetting("rows", target)}
-            />
-            <span>x</span>
-            <input
-              type="number"
-              defaultValue={columns}
-              onChange={({ target }) => this.modifySetting("columns", target)}
-            />
-          </Minesweeper.Settings.Grid>
-          <Minesweeper.Settings.Bombs>
-            <span>
-              <img src={bomb} alt="bomb" />
-            </span>
-            <input
-              type="number"
-              defaultValue={bombs}
-              onChange={({ target }) => this.modifySetting("bombs", target)}
-            />
-          </Minesweeper.Settings.Bombs>
-          <Minesweeper.Settings.SaveButton onClick={this.saveSettings}>
-            Save and Restart Game
-          </Minesweeper.Settings.SaveButton>
-        </Minesweeper.Settings>
-      </Minesweeper>
+            </Minesweeper.Settings.Bombs>
+            <Minesweeper.Settings.SaveButton onClick={this.saveSettings}>
+              Save and Restart Game
+            </Minesweeper.Settings.SaveButton>
+          </Minesweeper.Settings>
+        </Minesweeper>
+        <Minesweeper.SourceCode>
+          <a href="https://github.com/LonelyLiaR/minesweeper">[Source Code]</a>
+        </Minesweeper.SourceCode>
+      </Fragment>
     );
   }
   restartGame() {
@@ -247,7 +257,7 @@ class App extends Component {
     this.setState({
       moves: 0,
       flags: this.state.bombs,
-      time: "0.00",
+      time: 0,
       gameState: GAME.INIT
     });
     this.rewriteGrid();
@@ -329,7 +339,7 @@ class App extends Component {
           this.toggleTimer(true);
         }
         if (state === STATE.UNKNOWN) {
-          handleState.minesGrid = this.checkout(minesGrid, x, y);
+          handleState.minesGrid = this.checkout(minesGrid, x, y, true);
         } else if (state === STATE.BOMB) {
           minesGrid[x][y].state = STATE.BOOM;
           bombsPosition.forEach(p => {
@@ -346,13 +356,15 @@ class App extends Component {
       this.setState(handleState);
     }
   }
-  checkout(minesGrid, x, y) {
+  checkout(minesGrid, x, y, deep) {
     let bombs = 0;
     const needCheckout = [];
+    const shallowCheckout = [];
     if (x !== 0) {
       if (
         minesGrid[x - 1][y].state === STATE.UNKNOWN &&
-        !minesGrid[x - 1][y].flagging
+        !minesGrid[x - 1][y].flagging &&
+        deep
       ) {
         needCheckout.push([x - 1, y]);
       } else if (minesGrid[x - 1][y].state === STATE.BOMB) {
@@ -361,11 +373,17 @@ class App extends Component {
       if (y !== 0) {
         if (
           minesGrid[x - 1][y - 1].state === STATE.UNKNOWN &&
-          minesGrid[x][y - 1].state === STATE.UNKNOWN &&
-          minesGrid[x - 1][y].state === STATE.UNKNOWN &&
-          !minesGrid[x - 1][y - 1].flagging
+          !minesGrid[x - 1][y - 1].flagging &&
+          deep
         ) {
-          needCheckout.push([x - 1, y - 1]);
+          if (
+            minesGrid[x][y - 1].state === STATE.UNKNOWN &&
+            minesGrid[x - 1][y].state === STATE.UNKNOWN
+          ) {
+            needCheckout.push([x - 1, y - 1]);
+          } else {
+            shallowCheckout.push([x - 1, y - 1]);
+          }
         } else if (minesGrid[x - 1][y - 1].state === STATE.BOMB) {
           bombs += 1;
         }
@@ -373,11 +391,17 @@ class App extends Component {
       if (y !== this.state.columns - 1) {
         if (
           minesGrid[x - 1][y + 1].state === STATE.UNKNOWN &&
-          minesGrid[x][y + 1].state === STATE.UNKNOWN &&
-          minesGrid[x - 1][y].state === STATE.UNKNOWN &&
-          !minesGrid[x - 1][y + 1].flagging
+          !minesGrid[x - 1][y + 1].flagging &&
+          deep
         ) {
-          needCheckout.push([x - 1, y + 1]);
+          if (
+            minesGrid[x][y + 1].state === STATE.UNKNOWN &&
+            minesGrid[x - 1][y].state === STATE.UNKNOWN
+          ) {
+            needCheckout.push([x - 1, y + 1]);
+          } else {
+            shallowCheckout.push([x - 1, y + 1]);
+          }
         } else if (minesGrid[x - 1][y + 1].state === STATE.BOMB) {
           bombs += 1;
         }
@@ -386,7 +410,8 @@ class App extends Component {
     if (x !== this.state.rows - 1) {
       if (
         minesGrid[x + 1][y].state === STATE.UNKNOWN &&
-        !minesGrid[x + 1][y].flagging
+        !minesGrid[x + 1][y].flagging &&
+        deep
       ) {
         needCheckout.push([x + 1, y]);
       } else if (minesGrid[x + 1][y].state === STATE.BOMB) {
@@ -395,11 +420,17 @@ class App extends Component {
       if (y !== 0) {
         if (
           minesGrid[x + 1][y - 1].state === STATE.UNKNOWN &&
-          minesGrid[x][y - 1].state === STATE.UNKNOWN &&
-          minesGrid[x + 1][y].state === STATE.UNKNOWN &&
-          !minesGrid[x + 1][y - 1].flagging
+          !minesGrid[x + 1][y - 1].flagging &&
+          deep
         ) {
-          needCheckout.push([x + 1, y - 1]);
+          if (
+            minesGrid[x][y - 1].state === STATE.UNKNOWN &&
+            minesGrid[x + 1][y].state === STATE.UNKNOWN
+          ) {
+            needCheckout.push([x + 1, y - 1]);
+          } else {
+            shallowCheckout.push([x + 1, y - 1]);
+          }
         } else if (minesGrid[x + 1][y - 1].state === STATE.BOMB) {
           bombs += 1;
         }
@@ -407,11 +438,17 @@ class App extends Component {
       if (y !== this.state.columns - 1) {
         if (
           minesGrid[x + 1][y + 1].state === STATE.UNKNOWN &&
-          minesGrid[x][y + 1].state === STATE.UNKNOWN &&
-          minesGrid[x + 1][y].state === STATE.UNKNOWN &&
-          !minesGrid[x + 1][y + 1].flagging
+          !minesGrid[x + 1][y + 1].flagging &&
+          deep
         ) {
-          needCheckout.push([x + 1, y + 1]);
+          if (
+            minesGrid[x][y + 1].state === STATE.UNKNOWN &&
+            minesGrid[x + 1][y].state === STATE.UNKNOWN
+          ) {
+            needCheckout.push([x + 1, y + 1]);
+          } else {
+            shallowCheckout.push([x + 1, y + 1]);
+          }
         } else if (minesGrid[x + 1][y + 1].state === STATE.BOMB) {
           bombs += 1;
         }
@@ -420,7 +457,8 @@ class App extends Component {
     if (y !== 0) {
       if (
         minesGrid[x][y - 1].state === STATE.UNKNOWN &&
-        !minesGrid[x][y - 1].flagging
+        !minesGrid[x][y - 1].flagging &&
+        deep
       ) {
         needCheckout.push([x, y - 1]);
       } else if (minesGrid[x][y - 1].state === STATE.BOMB) {
@@ -430,7 +468,8 @@ class App extends Component {
     if (y !== this.state.columns - 1) {
       if (
         minesGrid[x][y + 1].state === STATE.UNKNOWN &&
-        !minesGrid[x][y + 1].flagging
+        !minesGrid[x][y + 1].flagging &&
+        deep
       ) {
         needCheckout.push([x, y + 1]);
       } else if (minesGrid[x][y + 1].state === STATE.BOMB) {
@@ -439,10 +478,17 @@ class App extends Component {
     }
     minesGrid[x][y].state = bombs === 0 ? STATE.SAFE : bombs;
     minesGrid[x][y].showMask = false;
-    if (minesGrid[x][y].state === STATE.SAFE && !!needCheckout.length) {
-      needCheckout.forEach(c => {
-        this.checkout(minesGrid, c[0], c[1]);
-      });
+    if (minesGrid[x][y].state === STATE.SAFE) {
+      if (!!needCheckout.length) {
+        needCheckout.forEach(c => {
+          this.checkout(minesGrid, c[0], c[1], true);
+        });
+      }
+      if (!!shallowCheckout.length) {
+        shallowCheckout.forEach(c => {
+          this.checkout(minesGrid, c[0], c[1], false);
+        });
+      }
     }
     return minesGrid;
   }
@@ -488,9 +534,9 @@ class App extends Component {
       const startTime = new Date();
       timer = setInterval(() => {
         this.setState({
-          time: ((new Date() - startTime) / 1000).toFixed(2)
+          time: parseInt((new Date() - startTime) / 1000, 10)
         });
-      }, 100);
+      }, 1000);
     } else {
       clearInterval(timer);
     }

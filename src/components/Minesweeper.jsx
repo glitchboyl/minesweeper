@@ -2,7 +2,7 @@
 import Styled from "styled-components";
 
 const Minesweeper = Styled.div`
-    top: 10%;
+    margin-top: 5%;
     border-radius: 10px;
     border: 5px solid #F4F4F4;
     display: inline-block;
@@ -211,8 +211,18 @@ Minesweeper.Settings.SaveButton = Styled.button`
     }
 `;
 
-// Minesweeper.Settings.asd = Styled.input`
-//         border: 1px solid #e0e0e0;
-// `;
+Minesweeper.SourceCode = Styled.div`
+    margin-top: 2.5%;
+
+    a {
+        color: #2DB4D8;
+        text-decoration: none;
+        transition: color .3s;
+
+        &:hover {
+            color: #22BAD9;
+        }
+    }
+`;
 
 export default Minesweeper;
