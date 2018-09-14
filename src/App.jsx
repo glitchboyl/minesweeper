@@ -7,6 +7,7 @@ import open_mouth from "assets/open_mouth.svg";
 import sunglasses from "assets/sunglasses.svg";
 import dizzy_face from "assets/dizzy_face.svg";
 import wrench from "assets/wrench.svg";
+import joystick from "assets/joystick.svg";
 import bomb from "assets/bomb.svg";
 import triangular_flag_on_post from "assets/triangular_flag_on_post.svg";
 import boom from "assets/boom.svg";
@@ -23,6 +24,17 @@ let MinesGrid = null;
 let timer = null;
 let bombsPosition = [];
 let flaggingBombs = [];
+let settings;
+if (!!localStorage.getItem("$ETTINGS")) {
+  settings = JSON.parse(localStorage.getItem("$ETTINGS"));
+} else {
+  settings = {
+    rows: 10,
+    columns: 10,
+    bombs: 10
+  };
+  localStorage.setItem("$ETTINGS", JSON.stringify(settings));
+}
 
 const STATE = {
   UNKNOWN: 0,
@@ -104,25 +116,27 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      xs: 10,
-      ys: 10,
-      bombs: 10,
-      flags: 10,
+      rows: settings.rows || 10,
+      columns: settings.columns || 10,
+      bombs: settings.bombs || 10,
+      flags: settings.bombs || 10,
       moves: 0,
-      time: 0.0,
+      time: "0.00",
       minesGrid: [],
       showSettings: false,
       clicking: false,
       gameState: GAME.INIT
     };
     this.restartGame = this.restartGame.bind(this);
+    this.saveSettings = this.saveSettings.bind(this);
   }
   componentWillMount() {
     this.rewriteGrid();
   }
   render() {
     const {
-      minesGrid,
+      rows,
+      columns,
       showSettings,
       clicking,
       flags,
@@ -131,52 +145,6 @@ class App extends Component {
       time,
       gameState
     } = this.state;
-    if (!MinesGrid) {
-      MinesGrid = () =>
-        minesGrid.map((row, x) => {
-          return (
-            <Minesweeper.Game.MinesGrid.Row key={`row-${x}`}>
-              {row.map((cell, y) => (
-                <Minesweeper.Game.MinesGrid.Cell
-                  key={`${x},${y}`}
-                  onMouseDown={() => this.setState({ clicking: true })}
-                  onMouseUp={((x, y) => ({ button }) => {
-                    this.setState({ clicking: false });
-                    if (button === 0) {
-                      return this.handleClick(x, y);
-                    } else if (button === 2) {
-                      return this.toggleFlag(x, y);
-                    }
-                  })(x, y)}
-                  onContextMenu={e => {
-                    e.preventDefault();
-                  }}
-                >
-                  <Minesweeper.Game.MinesGrid.Cell.Mask
-                    style={{ display: cell.showMask ? "block" : "none" }}
-                  />
-                  {graphically(cell.state)}
-                  {cell.flagging ? (
-                    <img
-                      style={{
-                        width: "70%",
-                        margin: "15%",
-                        top: 0,
-                        left: 0,
-                        position: "absolute"
-                      }}
-                      src={triangular_flag_on_post}
-                      alt="triangular_flag_on_post"
-                    />
-                  ) : (
-                    ""
-                  )}
-                </Minesweeper.Game.MinesGrid.Cell>
-              ))}
-            </Minesweeper.Game.MinesGrid.Row>
-          );
-        });
-    }
     return (
       <Minesweeper>
         <Minesweeper.ToggleButton
@@ -193,8 +161,8 @@ class App extends Component {
           />
           <img
             style={{ display: showSettings ? "block" : "none" }}
-            src={triangular_flag_on_post}
-            alt="triangular_flag_on_post"
+            src={joystick}
+            alt="joystick"
           />
         </Minesweeper.ToggleButton>
         <Minesweeper.Game>
@@ -238,43 +206,108 @@ class App extends Component {
               title="Moves"
               value={`${moves}`}
             />
-            <Minesweeper.Game.Statistics.Field
-              title="Time"
-              value={`${time.toFixed(1)}`}
-            />
+            <Minesweeper.Game.Statistics.Field title="Time" value={`${time}`} />
           </Minesweeper.Game.Statistics>
         </Minesweeper.Game>
         <Minesweeper.Settings
           style={{ display: showSettings ? "block" : "none" }}
-        />
+        >
+          <Minesweeper.Settings.Grid>
+            <input
+              type="number"
+              defaultValue={rows}
+              onChange={({ target }) => this.modifySetting("rows", target)}
+            />
+            <span>x</span>
+            <input
+              type="number"
+              defaultValue={columns}
+              onChange={({ target }) => this.modifySetting("columns", target)}
+            />
+          </Minesweeper.Settings.Grid>
+          <Minesweeper.Settings.Bombs>
+            <span>
+              <img src={bomb} alt="bomb" />
+            </span>
+            <input
+              type="number"
+              defaultValue={bombs}
+              onChange={({ target }) => this.modifySetting("bombs", target)}
+            />
+          </Minesweeper.Settings.Bombs>
+          <Minesweeper.Settings.SaveButton onClick={this.saveSettings}>
+            Save and Restart Game
+          </Minesweeper.Settings.SaveButton>
+        </Minesweeper.Settings>
       </Minesweeper>
     );
   }
   restartGame() {
-    MinesGrid = null;
-    bombsPosition = [];
-    flaggingBombs = [];
     this.toggleTimer(false);
     this.setState({
       moves: 0,
       flags: this.state.bombs,
-      time: 0.0,
+      time: "0.00",
       gameState: GAME.INIT
     });
     this.rewriteGrid();
   }
   rewriteGrid() {
-    const { xs, ys, bombs } = this.state;
-    const minesGrid = new Array(xs).fill(STATE.UNKNOWN).map(() =>
-      new Array(ys).fill(STATE.UNKNOWN).map(() => ({
+    const { rows, columns, bombs } = this.state;
+    const minesGrid = new Array(rows).fill(STATE.UNKNOWN).map(() =>
+      new Array(columns).fill(STATE.UNKNOWN).map(() => ({
         state: STATE.UNKNOWN,
         showMask: true,
         flagging: false
       }))
     );
+    MinesGrid = () =>
+      minesGrid.map((row, x) => (
+        <Minesweeper.Game.MinesGrid.Row key={`row-${x}`}>
+          {row.map((cell, y) => (
+            <Minesweeper.Game.MinesGrid.Cell
+              key={`${x},${y}`}
+              onMouseDown={() => this.setState({ clicking: true })}
+              onMouseUp={((x, y) => ({ button }) => {
+                this.setState({ clicking: false });
+                if (button === 0) {
+                  return this.handleClick(x, y);
+                } else if (button === 2) {
+                  return this.toggleFlag(x, y);
+                }
+              })(x, y)}
+              onContextMenu={e => {
+                e.preventDefault();
+              }}
+            >
+              <Minesweeper.Game.MinesGrid.Cell.Mask
+                style={{ display: cell.showMask ? "block" : "none" }}
+              />
+              {graphically(cell.state)}
+              {cell.flagging ? (
+                <img
+                  style={{
+                    width: "70%",
+                    margin: "15%",
+                    top: 0,
+                    left: 0,
+                    position: "absolute"
+                  }}
+                  src={triangular_flag_on_post}
+                  alt="triangular_flag_on_post"
+                />
+              ) : (
+                ""
+              )}
+            </Minesweeper.Game.MinesGrid.Cell>
+          ))}
+        </Minesweeper.Game.MinesGrid.Row>
+      ));
+    bombsPosition = [];
+    flaggingBombs = [];
     while (bombsPosition.length < bombs) {
-      let x = randomNumber(xs);
-      let y = randomNumber(ys);
+      let x = randomNumber(rows);
+      let y = randomNumber(columns);
       let p = `${x},${y}`;
       if (!bombsPosition.includes(p)) {
         bombsPosition.push(p);
@@ -292,7 +325,7 @@ class App extends Component {
       const handleState = {};
       if (showMask && !flagging) {
         let { minesGrid, moves, time } = this.state;
-        if (!time) {
+        if (!parseFloat(time)) {
           this.toggleTimer(true);
         }
         if (state === STATE.UNKNOWN) {
@@ -337,7 +370,7 @@ class App extends Component {
           bombs += 1;
         }
       }
-      if (y !== this.state.ys - 1) {
+      if (y !== this.state.columns - 1) {
         if (
           minesGrid[x - 1][y + 1].state === STATE.UNKNOWN &&
           minesGrid[x][y + 1].state === STATE.UNKNOWN &&
@@ -350,7 +383,7 @@ class App extends Component {
         }
       }
     }
-    if (x !== this.state.xs - 1) {
+    if (x !== this.state.rows - 1) {
       if (
         minesGrid[x + 1][y].state === STATE.UNKNOWN &&
         !minesGrid[x + 1][y].flagging
@@ -371,7 +404,7 @@ class App extends Component {
           bombs += 1;
         }
       }
-      if (y !== this.state.ys - 1) {
+      if (y !== this.state.columns - 1) {
         if (
           minesGrid[x + 1][y + 1].state === STATE.UNKNOWN &&
           minesGrid[x][y + 1].state === STATE.UNKNOWN &&
@@ -394,7 +427,7 @@ class App extends Component {
         bombs += 1;
       }
     }
-    if (y !== this.state.ys - 1) {
+    if (y !== this.state.columns - 1) {
       if (
         minesGrid[x][y + 1].state === STATE.UNKNOWN &&
         !minesGrid[x][y + 1].flagging
@@ -418,7 +451,7 @@ class App extends Component {
     if (!isEnd(gameState)) {
       const { showMask, flagging } = this.state.minesGrid[x][y];
       if (showMask) {
-        if (!time) {
+        if (!parseFloat(time)) {
           this.toggleTimer(true);
         }
         this.setState(({ minesGrid, flags, gameState }) => {
@@ -452,15 +485,63 @@ class App extends Component {
   }
   toggleTimer(s) {
     if (s) {
-      this.setState(({ time }) => ({
-        time: time + 0.1
-      }));
-      timer = setTimeout(() => {
-        this.toggleTimer(s);
-      }, 50);
+      const startTime = new Date();
+      timer = setInterval(() => {
+        this.setState({
+          time: ((new Date() - startTime) / 1000).toFixed(2)
+        });
+      }, 100);
     } else {
-      clearTimeout(timer);
+      clearInterval(timer);
     }
+  }
+  modifySetting(c, target) {
+    let { value } = target;
+    switch (c) {
+      case "rows":
+        if (isNaN(value) || value < 1) {
+          target.value = value = 1;
+        }
+        if (value > 16) {
+          target.value = value = 16;
+        }
+        break;
+      case "columns":
+        if (isNaN(value) || value < 1) {
+          target.value = value = 1;
+        }
+        if (value > 30) {
+          target.value = value = 30;
+        }
+        break;
+      case "bombs":
+        const { rows, columns } = settings;
+        if (isNaN(value) || value < 1) {
+          target.value = value = 1;
+        }
+        if (value > rows * columns - 1) {
+          if (rows * columns === 1) {
+            target.value = value = 1;
+          } else {
+            target.value = value = rows * columns - 1;
+          }
+        }
+        if (value > 99) {
+          target.value = value = 99;
+        }
+        break;
+      default:
+        return;
+    }
+    settings[c] = parseInt(value, 10);
+  }
+  saveSettings() {
+    localStorage.setItem("$ETTINGS", JSON.stringify(settings));
+    this.setState(settings);
+    setTimeout(() => {
+      this.restartGame();
+      this.setState({ showSettings: false });
+    }, 1);
   }
 }
 

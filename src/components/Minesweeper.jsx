@@ -29,6 +29,7 @@ Minesweeper.ToggleButton = Styled.button`
 Minesweeper.Game = children => <div {...children} />;
 
 Minesweeper.Game.Container = Styled.div`
+    min-width: 320px;
     padding: 20px 12.5px 15px;
     background-color: #FFFFFF;
     border-top-left-radius: 10px;
@@ -95,7 +96,7 @@ Minesweeper.Game.MinesGrid.Cell.Safe = Styled.span`
 `;
 
 Minesweeper.Game.Statistics = Styled.div`
-    padding: 10px 25px 5px;
+    padding: 10px 10% 5px;
     background-color: #F4F4F4;
     display: flex;
     justify-content: space-between;
@@ -138,9 +139,76 @@ Minesweeper.Settings = Styled.div`
     height: 100%;
     top: 0;
     left: 0;
+    padding: 50px 12.5px 15px;
     background-color: #FFFFFF;
     display: none;
     position: absolute;
+
+    input {
+        padding: 12.5px 15px;
+        color: #666666;
+        font-size: 13px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+    }
+`;
+
+Minesweeper.Settings.Grid = Styled.div`
+    width: 295px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    position: relative;
+
+    input {
+        width: 50%;
+    }
+
+    span {
+        margin: 0 10px;
+        color: #666666;
+    }
+`;
+
+Minesweeper.Settings.Bombs = Styled.div`    
+    width: 295px;
+    margin: 0 auto;
+    margin-top: 15px;
+    position: relative;
+
+    input {    
+        width: 100%;
+        padding-left: 55px;
+    }
+
+    span {
+        margin: 7.5px 0;
+        padding: 5px 10px 5px 12.5px;
+        border-right: 1px solid #e0e0e0;
+        position: absolute;
+
+        img {
+            width: 17.5px;
+        }
+    }
+`;
+
+Minesweeper.Settings.SaveButton = Styled.button`
+    width: 295px;
+    margin-top: 45px;
+    padding: 12.5px 0;
+    color: #666666;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #f7f7f7;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    transition: background-color .3s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #EEEEEE;
+    }
 `;
 
 // Minesweeper.Settings.asd = Styled.input`
