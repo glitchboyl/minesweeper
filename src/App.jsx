@@ -253,13 +253,13 @@ class App extends Component {
     );
   }
   restartGame() {
-    this.toggleTimer(false);
     this.setState({
       moves: 0,
       flags: this.state.bombs,
       time: 0,
       gameState: GAME.INIT
     });
+    this.toggleTimer(false);
     this.rewriteGrid();
   }
   rewriteGrid() {
@@ -531,14 +531,12 @@ class App extends Component {
   }
   toggleTimer(s) {
     if (s) {
-      const startTime = new Date();
-      timer = setInterval(() => {
-        this.setState({
-          time: parseInt((new Date() - startTime) / 1000, 10)
-        });
+      this.setState(({ time }) => ({ time: time + 1 }));
+      timer = setTimeout(() => {
+        this.toggleTimer(s);
       }, 1000);
     } else {
-      clearInterval(timer);
+      clearTimeout(timer);
       timer = null;
     }
   }
