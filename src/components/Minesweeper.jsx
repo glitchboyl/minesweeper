@@ -216,6 +216,7 @@ Minesweeper.SourceCode = Styled.div`
 
     a {
         color: #2DB4D8;
+        font-size: 14px;
         text-decoration: none;
         transition: color .3s;
 
