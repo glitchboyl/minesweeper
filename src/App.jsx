@@ -539,6 +539,7 @@ class App extends Component {
       }, 1000);
     } else {
       clearInterval(timer);
+      timer = null;
     }
   }
   modifySetting(c, target) {
