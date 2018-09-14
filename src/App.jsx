@@ -507,7 +507,7 @@ class App extends Component {
             if (minesGrid[x][y].state === STATE.BOMB) {
               flaggingBombs.push(`${x},${y}`);
             }
-            if (flaggingBombs.length === bombsPosition.length) {
+            if (flaggingBombs.length === bombsPosition.length && flags === 0) {
               gameState = GAME.WIN;
               this.toggleTimer(false);
             }
