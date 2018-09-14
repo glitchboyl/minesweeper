@@ -30,6 +30,7 @@ Minesweeper.Game = children => <div {...children} />;
 
 Minesweeper.Game.Container = Styled.div`
     min-width: 320px;
+    min-height: 250px;
     padding: 20px 12.5px 15px;
     background-color: #FFFFFF;
     border-top-left-radius: 10px;
