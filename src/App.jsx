@@ -316,14 +316,12 @@ class App extends Component {
     bombsPosition = [];
     flaggingBombs = [];
     while (bombsPosition.length < bombs) {
-      let x = randomNumber(rows);
-      let y = randomNumber(columns);
-      let p = `${x},${y}`;
+      const x = randomNumber(rows),
+        y = randomNumber(columns);
+      const p = `${x},${y}`;
       if (!bombsPosition.includes(p)) {
         bombsPosition.push(p);
         minesGrid[x][y].state = STATE.BOMB;
-      } else {
-        continue;
       }
     }
     this.setState({ minesGrid });
@@ -339,7 +337,7 @@ class App extends Component {
           this.toggleTimer(true);
         }
         if (state === STATE.UNKNOWN) {
-          handleState.minesGrid = this.checkout(minesGrid, x, y, true);
+          this.checkout(minesGrid, x, y, true);
         } else if (state === STATE.BOMB) {
           minesGrid[x][y].state = STATE.BOOM;
           bombsPosition.forEach(p => {
@@ -368,7 +366,7 @@ class App extends Component {
       ) {
         needCheckout.push([x - 1, y]);
       } else if (minesGrid[x - 1][y].state === STATE.BOMB) {
-        bombs += 1;
+        bombs++;
       }
       if (y !== 0) {
         if (
@@ -376,16 +374,12 @@ class App extends Component {
           !minesGrid[x - 1][y - 1].flagging &&
           deep
         ) {
-          if (
-            minesGrid[x][y - 1].state === STATE.UNKNOWN &&
-            minesGrid[x - 1][y].state === STATE.UNKNOWN
-          ) {
-            needCheckout.push([x - 1, y - 1]);
-          } else {
-            shallowCheckout.push([x - 1, y - 1]);
-          }
+          minesGrid[x][y - 1].state === STATE.UNKNOWN &&
+          minesGrid[x - 1][y].state === STATE.UNKNOWN
+            ? needCheckout.push([x - 1, y - 1])
+            : shallowCheckout.push([x - 1, y - 1]);
         } else if (minesGrid[x - 1][y - 1].state === STATE.BOMB) {
-          bombs += 1;
+          bombs++;
         }
       }
       if (y !== this.state.columns - 1) {
@@ -394,16 +388,12 @@ class App extends Component {
           !minesGrid[x - 1][y + 1].flagging &&
           deep
         ) {
-          if (
-            minesGrid[x][y + 1].state === STATE.UNKNOWN &&
-            minesGrid[x - 1][y].state === STATE.UNKNOWN
-          ) {
-            needCheckout.push([x - 1, y + 1]);
-          } else {
-            shallowCheckout.push([x - 1, y + 1]);
-          }
+          minesGrid[x][y + 1].state === STATE.UNKNOWN &&
+          minesGrid[x - 1][y].state === STATE.UNKNOWN
+            ? needCheckout.push([x - 1, y + 1])
+            : shallowCheckout.push([x - 1, y + 1]);
         } else if (minesGrid[x - 1][y + 1].state === STATE.BOMB) {
-          bombs += 1;
+          bombs++;
         }
       }
     }
@@ -415,7 +405,7 @@ class App extends Component {
       ) {
         needCheckout.push([x + 1, y]);
       } else if (minesGrid[x + 1][y].state === STATE.BOMB) {
-        bombs += 1;
+        bombs++;
       }
       if (y !== 0) {
         if (
@@ -423,16 +413,12 @@ class App extends Component {
           !minesGrid[x + 1][y - 1].flagging &&
           deep
         ) {
-          if (
-            minesGrid[x][y - 1].state === STATE.UNKNOWN &&
-            minesGrid[x + 1][y].state === STATE.UNKNOWN
-          ) {
-            needCheckout.push([x + 1, y - 1]);
-          } else {
-            shallowCheckout.push([x + 1, y - 1]);
-          }
+          minesGrid[x][y - 1].state === STATE.UNKNOWN &&
+          minesGrid[x + 1][y].state === STATE.UNKNOWN
+            ? needCheckout.push([x + 1, y - 1])
+            : shallowCheckout.push([x + 1, y - 1]);
         } else if (minesGrid[x + 1][y - 1].state === STATE.BOMB) {
-          bombs += 1;
+          bombs++;
         }
       }
       if (y !== this.state.columns - 1) {
@@ -441,16 +427,12 @@ class App extends Component {
           !minesGrid[x + 1][y + 1].flagging &&
           deep
         ) {
-          if (
-            minesGrid[x][y + 1].state === STATE.UNKNOWN &&
-            minesGrid[x + 1][y].state === STATE.UNKNOWN
-          ) {
-            needCheckout.push([x + 1, y + 1]);
-          } else {
-            shallowCheckout.push([x + 1, y + 1]);
-          }
+          minesGrid[x][y + 1].state === STATE.UNKNOWN &&
+          minesGrid[x + 1][y].state === STATE.UNKNOWN
+            ? needCheckout.push([x + 1, y + 1])
+            : shallowCheckout.push([x + 1, y + 1]);
         } else if (minesGrid[x + 1][y + 1].state === STATE.BOMB) {
-          bombs += 1;
+          bombs++;
         }
       }
     }
@@ -462,7 +444,7 @@ class App extends Component {
       ) {
         needCheckout.push([x, y - 1]);
       } else if (minesGrid[x][y - 1].state === STATE.BOMB) {
-        bombs += 1;
+        bombs++;
       }
     }
     if (y !== this.state.columns - 1) {
@@ -473,7 +455,7 @@ class App extends Component {
       ) {
         needCheckout.push([x, y + 1]);
       } else if (minesGrid[x][y + 1].state === STATE.BOMB) {
-        bombs += 1;
+        bombs++;
       }
     }
     minesGrid[x][y].state = bombs === 0 ? STATE.SAFE : bombs;
@@ -490,7 +472,6 @@ class App extends Component {
         });
       }
     }
-    return minesGrid;
   }
   toggleFlag(x, y) {
     const { gameState, time } = this.state;
