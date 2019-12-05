@@ -6,4 +6,4 @@ A little Emoji Minesweeper game. Just for fun. :smile:
 
 Design was inspired by [emoji-minesweeper](https://github.com/muan/emoji-minesweeper).
 
-And if you are interested in it, you can check out [how to make it](https://lonelyliar.github.io/blog/#/p/2).
+And if you are interested in it, you can check out [how to make it](https://nghtmre.surge.sh/#/p/2).
